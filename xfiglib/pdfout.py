@@ -120,6 +120,34 @@ class pdfout():
                           style,dikte,gray))
     # add gray color default to 0
     # for gray in (0.0, 0.25, 0.50, 0.75, 1.0):        canvas.setFillGray(gray)
+
+  def image(self,filename,x,y,w = None,h = None):
+    """
+    Draw a image on (x,y) with the size (w,h)
+    Coordinates are relative to self.origin
+
+    @param x: x From this X point
+    @type  x: C{int}
+
+    @param y: y From this Y point
+    @type  y: C{int}
+
+    @param w: Set de image to this width
+    @type  w: C{int}
+
+    @param h: Make te image this height
+    @type  h: C{int}
+
+    @param filename: The name of the file to load
+    @type  filename: C{str}
+
+    """
+    if w != None:
+      w = self.mm2pos(w)
+    if h != None:
+      h = self.mm2pos(h)
+    self.drawings.append(('I',self.mm2pos(self.xorigin+x),self.mm2pos(self.paperheight-(self.yorigin+y)),
+                          w,h,filename))
      
   def tekst(self,x,y,text,font='Helvetica',fsize=12,align=0,gray=0):
     """
@@ -216,6 +244,8 @@ class pdfout():
           pdf.drawCentredString(cmd[1],cmd[2], cmd[3])
         else: #cmd[6] == 2:
           pdf.drawRightString( cmd[1],cmd[2], cmd[3])
+      elif cmd[0] == 'I':   # image(self,filename,x,y,w = None,h = None)
+        pdf.drawImage(cmd[5],cmd[1],cmd[2],cmd[3],cmd[4])
       else:
         error("unknown command")
     self.drawings=[]

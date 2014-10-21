@@ -24,7 +24,7 @@ from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.units import cm
 
-FILOFAXDIYVERSION="FilofaxDIY v1.1"    # should be from versioning system, but how can I do this ????
+FILOFAXDIYVERSION="https://code.google.com/p/filofax-diy/"    # should be from versioning system, but how can I do this ????
 
 class filofax:
   def __init__(self,language,font,lineheight,paper,orient,filename,filofax):
@@ -104,7 +104,6 @@ class filofax:
         self.oddpageorigins.append((self.cutlinesx[x],self.cutlinesy[y]))
     
     #dynamic vars
-    #self.paperpagenr = 0      # is this still needed ??? page number of outputed paper pages
     self.currentonevenpage = False    # true or false,depending on which side of paper
     self.currentagendapage = self.agendapagesperpage - 1   # point to last agenda page
     # because reportlab pdf, cannot write to two pages at the same time, all draw actions are bufferd
@@ -126,8 +125,9 @@ class filofax:
     # Show the year at 1/3 of page
     self.currentpage.tekst(self.outermargin+(self.agendawidth-self.innermargin-self.outermargin)/2,self.agendaheight/3,year,self.font,48,1)
     # show the program name and version at 7/8 of the page
-    self.currentpage.tekst(self.outermargin+(self.agendawidth-self.innermargin-self.outermargin)/2,self.agendaheight*7/8,FILOFAXDIYVERSION,self.font,12,1)
-
+    self.currentpage.tekst(self.outermargin+(self.agendawidth-self.innermargin-self.outermargin)/2,self.agendaheight*7/8,FILOFAXDIYVERSION,self.font,8,1)
+    self.currentpage.image('gplv3.jpg',self.innermargin+5,self.agendaheight-10,7.38,3.77)
+    
   def calender(self,year):
     pass
 
@@ -347,8 +347,8 @@ class filofax:
     self.currentpage.poporigin()
     self.currentpage.poporigin()
 
-  def punchholes(self):                        # wrong !  should be:(self,pdfout paper,bool even)
-    """ Draw the punch hole on the page
+  def punchholes(self):
+    """ Draw the punch hole on one agenda page
     Using parameter self.nrholes,holestep and holeoffset. This defines just the half of the holes, from the middle.
     Because holes are mirrored to the center. nrholes is the half of the total number of holes, rounded UP
     If holeoffset = 0, just one hole is draw
@@ -439,39 +439,54 @@ class filofax:
     self.canvas.save()
 
 allowedpapers = {
-"A4":reportlab.lib.pagesizes.A4,
-"A3":reportlab.lib.pagesizes.A3,
-"A2":reportlab.lib.pagesizes.A2,
-"A1":reportlab.lib.pagesizes.A1,
-"A0":reportlab.lib.pagesizes.A0,
-"letter":reportlab.lib.pagesizes.letter,
-"legal":reportlab.lib.pagesizes.legal,
-"elevenSeventeen":reportlab.lib.pagesizes.elevenSeventeen,
-"B5":reportlab.lib.pagesizes.B5,
-"B4":reportlab.lib.pagesizes.B4,
-"B3":reportlab.lib.pagesizes.B3,
-"B2":reportlab.lib.pagesizes.B2,
-"B1":reportlab.lib.pagesizes.B1,
-"B0":reportlab.lib.pagesizes.B0}
+  "A4":reportlab.lib.pagesizes.A4,
+  "A3":reportlab.lib.pagesizes.A3,
+  "A2":reportlab.lib.pagesizes.A2,
+  "A1":reportlab.lib.pagesizes.A1,
+  "A0":reportlab.lib.pagesizes.A0,
+  "letter":reportlab.lib.pagesizes.letter,
+  "legal":reportlab.lib.pagesizes.legal,
+  "elevenSeventeen":reportlab.lib.pagesizes.elevenSeventeen,
+  "B5":reportlab.lib.pagesizes.B5,
+  "B4":reportlab.lib.pagesizes.B4,
+  "B3":reportlab.lib.pagesizes.B3,
+  "B2":reportlab.lib.pagesizes.B2,
+  "B1":reportlab.lib.pagesizes.B1,
+  "B0":reportlab.lib.pagesizes.B0}
 
 # width,height,nrholes,offset,distancebetweenholes
 agendasizes = {
-'A4':(210,297,2,0,50),    # holes are not good
-'A5':(148,210,3,19,19),     # holes not sure
-'Personal':(95,171,3,23,19),
-'Compact':(95,171,3,0,19),  # holes not sure
-'Pocket':(81,120,3,0,19),   # holes not sure
-'Mini':(67,105,3,0,40)}    # center hole is twice,holes not sure
+  'A4':(210,297,2,0,50),    # holes are not good
+  'A5':(148,210,3,19,19),     # holes not sure
+  'Personal':(95,171,3,23,19),
+  'Compact':(95,171,3,0,19),  # holes not sure
+  'Pocket':(81,120,3,0,19),   # holes not sure
+  'Mini':(67,105,3,0,40)}    # center hole is twice,holes not sure
 
+fonts = (
+    "Courier",
+    "Courier-Bold"
+    "Courier-BoldOblique",
+    "Courier-Oblique",
+    "Helvetica",
+    "Helvetica-Bold",
+    "Helvetica-BoldOblique",
+    "Helvetica-Oblique",
+    "Symbol",
+    "Times-Bold",
+    "Times-BoldItalic",
+    "Times-Italic",
+    "Times-Roman",
+    "ZapfDingbats" )
 parser = argparse.ArgumentParser(description='Create a FilofaxDIY printable agenda')
 parser.add_argument('--landscape',dest='orient',action='store_const',const='Landscape')
 parser.add_argument('--portrait',dest='orient',action='store_const',const='Portrait')
 parser.add_argument('--paper',default='letter',choices=allowedpapers)
-parser.add_argument('--font',default='Helvetica',choices=('Helvetica','Times-Roman'))
+parser.add_argument('--font',default='Helvetica',choices=fonts)
 #parser.add_argument('--filofax',default='Personal',choices=agendasizes)
 parser.add_argument('--filofax',default='Personal',choices=('Personal'))
 parser.add_argument('--format',default='weekon2pages',choices=('weekon2pages','weekon6pages'))
-parser.add_argument('--lineheight',default=7,type=int,choices=range(11))
+parser.add_argument('--lineheight',default=4,type=int,choices=range(11))
 parser.add_argument('--year',type=int,default=datetime.date.today().year + 1,choices=range(2014,2025))
 #parser.add_argument('--language',choices=('en_US.UTF8','nl_NL.UTF8','fy_NL.UTF8'))
 parser.add_argument('--language',type=str)
@@ -500,7 +515,7 @@ nextnewyearsday = datetime.date(args.year,1,1)
 lastmondayofyear = nextnewyearsday - nextnewyearsday.weekday() * datetime.date.resolution
 
 day = lastmondayofyear
-outputfilename = "Agenda_{year}_{locale}_{format}.pdf".format(year = args.year,locale = args.language,format = args.format)
+outputfilename = "{size}_{year}_{locale}_{format}.pdf".format(size = args.filofax,year = args.year,locale = args.language,format = args.format)
 #print(outputfilename)
 agenda = filofax(args.language,args.font,args.lineheight,allowedpapers[args.paper],args.orient,outputfilename,agendasizes[args.filofax])
 agenda.titlepage(str(args.year))
