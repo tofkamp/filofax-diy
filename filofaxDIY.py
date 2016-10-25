@@ -24,7 +24,7 @@ from reportlab.pdfgen import canvas
 import reportlab.lib.pagesizes
 from reportlab.lib.units import cm
 
-FILOFAXDIYVERSION="https://code.google.com/p/filofax-diy/"    # should be from versioning system, but how can I do this ????
+FILOFAXDIYVERSION="https://github.com/tofkamp/filofax-diy"    # should be from versioning system, but how can I do this ????
 
 class filofax:
   def __init__(self,language,font,lineheight,paper,orient,filename,filofax):
